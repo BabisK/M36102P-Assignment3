@@ -73,3 +73,19 @@ fit <- lm(Y ~ X1 + X2 + X3 + W + X1:W + X2:W + X3:W, data = data)
 print(summary(fit))
 par(mfrow = c(2,2))
 plot(fit)
+shapiro.test(fit$residuals)
+
+fitnull <- lm(Y ~ 1, data = data)
+stepSR <- step(fitnull, scope = list(lower = ~ 1, upper = ~ X1 + X2 + X3 + W + X1:W + X2:W + X3:W), direction = "both", data = data)
+print(stepSR)
+
+library(leaps)
+leaps <- regsubsets(Y ~ X1 + X2 + X3 + W + X1:W + X2:W + X3:W, data = data, nbest = 1)
+print(summary(leaps))
+plot(leaps,scale="r2")
+
+bestfit <- lm(Y ~ X2 + X1 + W + X2:W + X1:W, data = data)
+print(anova(bestfit))
+
+testdata <- data.frame(X1 = 3.1, X2 = 3.75, X3 = 1.2, W = "A")
+predict.lm(bestfit, newdata = testdata)
