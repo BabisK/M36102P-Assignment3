@@ -475,4 +475,232 @@ levels of W in each plot using a different color.
   \label{fig:scattercolors}
   \end{figure}
 
+\subsection{}
+Run the regression model of $Y$ on all the remaining variables ($X_1, X_2, X_3,
+W$), including the non-additive terms (i.e. interactions of the continuous
+predictors with the categorical)
+
+  \begin{lstlisting}
+Call:
+lm(formula = Y ~ X1 + X2 + X3 + W + X1:W + X2:W + X3:W, data = data)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.73883 -0.21607  0.00051  0.21813  0.74427 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)   2.3519     0.4965   4.737 5.33e-06 ***
+X1            0.6548     0.1168   5.605 1.09e-07 ***
+X2            0.2376     0.2629   0.904   0.3678    
+X3            0.2521     0.4384   0.575   0.5661    
+WB           -0.4564     0.6727  -0.678   0.4987    
+WC           -1.6520     0.7067  -2.338   0.0208 *  
+X1:WB        -0.2680     0.2172  -1.234   0.2194    
+X1:WC        -0.3245     0.2016  -1.610   0.1098    
+X2:WB         0.6708     0.3017   2.223   0.0278 *  
+X2:WC         0.7080     0.2765   2.561   0.0115 *  
+X3:WB        -0.9313     0.5866  -1.588   0.1146    
+X3:WC        -0.4219     0.4765  -0.885   0.3775    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.2997 on 138 degrees of freedom
+Multiple R-squared:  0.8787,	Adjusted R-squared:  0.869 
+F-statistic: 90.87 on 11 and 138 DF,  p-value: < 2.2e-16
+  \end{lstlisting}
+  
+\subsection{}
+Examine the regression assumptions and provide alternatives if any of them
+fails. Also provide a discussion of potential outliers and in uential points (if
+any).
+
+  \begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.6]{fittedmodel1.eps}
+  \caption{Fitted Model}
+  \label{fig:fittedmodel1}
+  \end{figure}
+
+We can see on the plot in figure~\ref{fig:fittedmodel1} that the residuals are
+independent of the predictor variables. They are a ``cloud'' with mean close to
+0.
+
+  \begin{lstlisting}
+	Shapiro-Wilk normality test
+
+data:  fit$residuals
+W = 0.99341, p-value = 0.7269
+  \end{lstlisting}
+  
+From the Q-Q plot and the Shapiro-Wilk test above we can confirm that the
+residuals are normally distributed.
+
+\subsection{}
+Use the ``stepwise regression'' and the ``all subset'' approach to examine
+whether you can reduce the dimension of the model.
+
+\begin{enumerate}
+  \item Stepwise regression
+  \begin{lstlisting}
+Start:  AIC=-55.6
+Y ~ 1
+
+       Df Sum of Sq     RSS      AIC
++ X2    1    77.643  24.525 -267.641
++ X3    1    68.353  33.815 -219.460
++ W     2    63.212  38.956 -196.230
++ X1    1     1.412 100.756  -55.690
+<none>              102.168  -55.602
+
+Step:  AIC=-267.64
+Y ~ X2
+
+       Df Sum of Sq     RSS     AIC
++ X1    1     8.196  16.329 -326.66
++ W     2     7.843  16.682 -321.45
++ X3    1     0.644  23.881 -269.63
+<none>               24.525 -267.64
+- X2    1    77.643 102.168  -55.60
+
+Step:  AIC=-326.66
+Y ~ X2 + X1
+
+       Df Sum of Sq     RSS     AIC
++ W     2     2.363  13.966 -346.11
++ X3    1     1.883  14.445 -343.04
+<none>               16.329 -326.66
+- X1    1     8.196  24.525 -267.64
+- X2    1    84.427 100.756  -55.69
+
+Step:  AIC=-346.11
+Y ~ X2 + X1 + W
+
+       Df Sum of Sq    RSS     AIC
++ X3    1    0.4090 13.556 -348.57
++ X2:W  2    0.5817 13.384 -348.49
++ X1:W  2    0.5641 13.402 -348.29
+<none>              13.966 -346.11
+- W     2    2.3632 16.329 -326.66
+- X1    1    2.7161 16.682 -321.45
+- X2    1   14.0382 28.004 -243.74
+
+Step:  AIC=-348.57
+Y ~ X2 + X1 + W + X3
+
+       Df Sum of Sq    RSS     AIC
++ X2:W  2    0.4883 13.068 -350.07
++ X1:W  2    0.3848 13.172 -348.88
++ X3:W  2    0.3720 13.184 -348.74
+<none>              13.556 -348.57
+- X3    1    0.4090 13.966 -346.11
+- W     2    0.8889 14.445 -343.04
+- X1    1    3.1250 16.681 -319.45
+- X2    1   13.7853 27.342 -245.33
+
+Step:  AIC=-350.07
+Y ~ X2 + X1 + W + X3 + X2:W
+
+       Df Sum of Sq    RSS     AIC
++ X1:W  2    0.4398 12.628 -351.20
++ X3:W  2    0.3875 12.681 -350.58
+<none>              13.068 -350.07
+- X2:W  2    0.4883 13.556 -348.57
+- X3    1    0.3156 13.384 -348.49
+- X1    1    3.2285 16.297 -318.95
+
+Step:  AIC=-351.2
+Y ~ X2 + X1 + W + X3 + X2:W + X1:W
+
+       Df Sum of Sq    RSS     AIC
+- X3    1   0.14311 12.771 -351.51
+<none>              12.628 -351.20
+- X1:W  2   0.43978 13.068 -350.07
++ X3:W  2   0.23370 12.395 -350.00
+- X2:W  2   0.54329 13.172 -348.88
+
+Step:  AIC=-351.51
+Y ~ X2 + X1 + W + X2:W + X1:W
+
+       Df Sum of Sq    RSS     AIC
+<none>              12.771 -351.51
++ X3    1   0.14311 12.628 -351.20
+- X1:W  2   0.61227 13.384 -348.49
+- X2:W  2   0.62995 13.402 -348.29
+
+Call:
+lm(formula = Y ~ X2 + X1 + W + X2:W + X1:W, data = data)
+
+Coefficients:
+(Intercept)           X2           X1           WB           WC        X2:WB        X2:WC        X1:WB        X1:WC  
+     2.3037       0.2834       0.6674      -0.1873      -1.6790       0.4522       0.6514      -0.4198      -0.4075  
+  \end{lstlisting}
+  The formula that we get with Stepwise regression is $Y ~ X_1 + X_2 + W +
+  X_1:W + X_2:W$
+  
+  \item All subset
+  \begin{lstlisting}
+Subset selection object
+Call: regsubsets.formula(Y ~ X1 + X2 + X3 + W + X1:W + X2:W + X3:W, 
+    data = data, nbest = 1)
+11 Variables  (and intercept)
+      Forced in Forced out
+X1        FALSE      FALSE
+X2        FALSE      FALSE
+X3        FALSE      FALSE
+WB        FALSE      FALSE
+WC        FALSE      FALSE
+X1:WB     FALSE      FALSE
+X1:WC     FALSE      FALSE
+X2:WB     FALSE      FALSE
+X2:WC     FALSE      FALSE
+X3:WB     FALSE      FALSE
+X3:WC     FALSE      FALSE
+1 subsets of each size up to 8
+Selection Algorithm: exhaustive
+         X1  X2  X3  WB  WC  X1:WB X1:WC X2:WB X2:WC X3:WB X3:WC
+1  ( 1 ) " " "*" " " " " " " " "   " "   " "   " "   " "   " "  
+2  ( 1 ) "*" "*" " " " " " " " "   " "   " "   " "   " "   " "  
+3  ( 1 ) "*" "*" "*" " " " " " "   " "   " "   " "   " "   " "  
+4  ( 1 ) "*" "*" " " " " "*" " "   " "   " "   " "   "*"   " "  
+5  ( 1 ) "*" "*" " " " " "*" " "   "*"   " "   " "   "*"   " "  
+6  ( 1 ) "*" " " " " " " "*" "*"   "*"   "*"   "*"   " "   " "  
+7  ( 1 ) "*" " " " " " " "*" "*"   "*"   "*"   "*"   "*"   " "  
+8  ( 1 ) "*" "*" " " " " "*" "*"   "*"   "*"   "*"   "*"   " "  
+  \end{lstlisting}
+  \begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.6]{allsubsets.eps}
+  \caption{All Subsets result}
+  \label{fig:allsubsets}
+  \end{figure}
+\end{enumerate}
+
+\subsection{}
+Use the ANOVA F-test to examine which is the ``best'' sub-model.
+
+For the model $Y ~ X_1 + X_2 + W + X_1:W + X_2:W$ the anova test yields:
+  \begin{lstlisting}
+Analysis of Variance Table
+
+Response: Y
+           Df Sum Sq Mean Sq  F value    Pr(>F)    
+X2          1 77.643  77.643 857.1976 < 2.2e-16 ***
+X1          1  8.196   8.196  90.4885 < 2.2e-16 ***
+W           2  2.363   1.182  13.0454 6.336e-06 ***
+X2:W        2  0.582   0.291   3.2113   0.04327 *  
+X1:W        2  0.612   0.306   3.3798   0.03684 *  
+Residuals 141 12.772   0.091                       
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+  \end{lstlisting}
+
+\subsection{}
+Using the model found in the previous subsection provide a point estimate and a
+$95\%$ confidence interval for the prediction of $Y$ when: $(X_1, X_2, X_3,
+W)=(3.1,3.75,1.2,A)$
+
+The predicted value is $Y = 5.435551$
+
+
 \end{document}

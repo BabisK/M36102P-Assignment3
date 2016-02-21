@@ -71,3 +71,5 @@ legend('topleft', legend = levels(data[["W"]]), col = 1:3, cex = 0.8, pch = 1)
 
 fit <- lm(Y ~ X1 + X2 + X3 + W + X1:W + X2:W + X3:W, data = data)
 print(summary(fit))
+par(mfrow = c(2,2))
+plot(fit)
